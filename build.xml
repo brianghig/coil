@@ -1,0 +1,13 @@
+<project name="CoilApp" default="usage" basedir=".">
+	
+	<import file="${basedir}/build-base.xml" />
+	
+	<property name="server.deploy.dir" location="/home/brian/apache-tomcat-7.0.34/webapps" />
+	
+	<description>ANT build script for the Spring App</description>
+	
+	<target name="deploy-war" depends="build-war">
+		<copy file="${war.file}" todir="${server.deploy.dir}" />
+	</target>
+	
+</project>

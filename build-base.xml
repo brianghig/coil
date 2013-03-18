@@ -1,0 +1,71 @@
+<project name="CoilApp" default="usage" basedir=".">
+	
+	<description>ANT build script for the Spring App</description>
+	
+	<property name="webinf.dir" location="${basedir}/web/WEB-INF" />
+	<property name="config.dir" location="${basedir}/config" />
+	<property name="src.dir" location="${basedir}/src"/>
+	<property name="build.tmp.dir" location="${basedir}/buildtmp" />
+	<property name="build.src.dir" location="${build.tmp.dir}/src"/>
+	<property name="lib.dir" location="${webinf.dir}/lib"/>
+	<property name="compile.dir" location="${basedir}/compile"/>
+	<property name="dist.dir" location="${basedir}/dist"/>
+	<property name="war.file" value="${dist.dir}/app.war" />
+	
+	<!-- Source Classpath for Compilation -->
+	<path id="classpathSrcId">
+		
+		<fileset dir="${lib.dir}">
+			<include name="*.jar"/>
+		</fileset>
+		
+		<fileset dir="${compile.dir}">
+			<include name="*.jar"/>
+		</fileset>
+		
+		<pathelement location="${build.src.dir}"/>
+		  
+	</path>
+	
+	<target name="usage" description="Prints the descriptions of each target to the console output">
+		<echo>For help, use "ant -p" instead...</echo>
+		<!-- <echo>Any specific task instructions go here...</echo> -->
+	</target>
+	
+	<target name="clean" description="Cleans up any previously built or potentially cached files in order to prepare for a clean build">
+		<echo>Cleaning up any existing build information in preparation for a new build...</echo>
+		
+		<delete dir="${build.src.dir}" />
+		<delete dir="${dist.dir}" />
+		
+		<mkdir dir="${build.src.dir}" />
+		<mkdir dir="${dist.dir}" />
+		
+	</target>
+	
+	<target name="compile" description="Compiles the main source code into the buildtmp directory" depends="clean">
+		<echo>Compiling ${src.dir} to ${build.src.dir}...</echo>
+		
+		<javac destdir="${build.src.dir}" debug="true">
+			<src path="${src.dir}" />
+			<classpath refid="classpathSrcId" />
+		</javac>
+			
+		<echo>... done compiling to ${build.src.dir}</echo>	
+	</target>
+	
+	<target name="build-war" description="Create a WAR file for the application" depends="compile">
+	
+		<echo>Creating WAR file at ${war.file}</echo>
+	
+		<war destfile="${war.file}" webxml="${webinf.dir}/web.xml">
+			<classes dir="${build.src.dir}" />
+			<lib dir="${lib.dir}" />
+			<webinf dir="${config.dir}">
+				<include name="**/*.xml"/>
+				<include name="**/*.properties"/>
+			</webinf>
+		</war>
+	
+	</target>
+</project>

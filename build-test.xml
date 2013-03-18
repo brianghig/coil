@@ -1,0 +1,167 @@
+<project name="CoilAppTestSuite" default="usage" basedir=".">
+	
+	<import file="${basedir}/build-base.xml" />
+	
+	<description>ANT build script for the Spring App Test Suite</description>
+	
+	<property name="src.tests.dir" location="${basedir}/test"/>
+	<property name="build.tests.dir" location="${build.tmp.dir}/test" />
+	<property name="output.reports.junit" location="${basedir}/reports/junit"/>
+	<property name="output.reports.tmp.junit" location="${basedir}/reports/tmp/junit"/>
+	
+	<!-- FindBugs Configuration -->
+	<property name="findbugs.home.dir" location="${basedir}/compile/findbugs" />
+	<property name="output.reports.findbugs" location="${basedir}/reports/findbugs"/>
+	
+	<!-- Default config values for JUNIT execution that may be overridden -->
+	<property name="junit.fork" value="yes"/>
+	<property name="junit.includefiles" value="**/*Test.java"/>
+	<property name="junit.excludefiles" value=""/>
+
+	<!-- Cobertura Code Coverage Configuration -->
+	<!-- Cobertura unit test coverage -->
+	<property name="cobertura.dir" location="${basedir}/compile/cobertura" />
+	<property name="output.reports.cobertura" location="${basedir}/reports/cobertura"/>
+	<property name="cobertura.ser.file" value="${basedir}/reports/tmp/cobertura.ser" />
+	<property name="cobertura.instrument.dir" location="${basedir}/reports/tmp/coberturainstrument" />
+	<path id="cobertura.path">
+		<fileset dir="${cobertura.dir}">
+			<include name="cobertura.jar" />
+			<include name="lib/**/*.jar" />
+		</fileset>
+	</path>
+	<taskdef classpathref="cobertura.path" resource="tasks.properties" />
+	
+	<target name="cobertura-instrument" depends="compile-test" description="Create Corbetura instrumentation">
+		
+		<mkdir dir="${cobertura.instrument.dir}" />
+		
+		<cobertura-instrument
+			datafile="${cobertura.ser.file}"
+			todir="${cobertura.instrument.dir}">
+			
+			<fileset dir="${build.src.dir}">
+				<include name="**/*.class" />
+				<exclude name="**/*Test.class" />
+			</fileset>
+			
+		</cobertura-instrument>
+		
+	</target>
+	
+	<target name="cobertura-report" depends="junit" description="Create Corbetura coverage report">
+		<mkdir dir="${output.reports.cobertura}" />
+		
+		<cobertura-report
+			format="xml"
+			datafile="${cobertura.ser.file}"
+			destdir="${output.reports.cobertura}"
+			srcdir="${src.dir}" />
+		
+	</target>
+	
+	<target name="junit" depends="clean-test,compile-test,cobertura-instrument">
+		<junit printsummary="yes" haltonfailure="no">
+			
+			<sysproperty key="net.sourceforge.cobertura.datafile" file="${cobertura.ser.file}" />
+			
+			<classpath location="${cobertura.instrument.dir}" />
+			<classpath location="${build.tests.dir}" />
+			<classpath refid="classpathSrcId" />
+			
+			<!--
+				The instrumented classes reference classes used by the
+				Cobertura runtime, so Cobertura and its dependencies
+				must be on your classpath.
+			-->
+			<classpath refid="cobertura.path" />
+			
+			<!-- <formatter type="plain" /> -->
+			<formatter type="xml" />
+			
+			<batchtest fork="${junit.fork}" todir="${output.reports.junit}">
+				<fileset dir="${src.tests.dir}">
+					<include name="${junit.includefiles}"/>
+					<exclude name="${junit.excludefiles}"/>
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+	
+	<target name="junit-report" depends="junit" description="Creates a JUNIT report from the output of the JUNIT tests assumed to have previously run. Not necessarily dependent on the 'junit' task because this may be run to refresh the reports at any given time">
+		<delete dir="${output.reports.junit}" />
+		<mkdir dir="${output.reports.junit}" />
+		<junitreport todir="${output.reports.junit}">
+			<fileset dir="${output.reports.tmp.junit}">
+				<include name="*.xml" />
+				<exclude name="*.txt" />
+			</fileset>
+			<report format="frames" todir="${output.reports.junit}" />
+		</junitreport>
+	</target>
+	
+	<target name="compile-test" description="Compiles the Test code for execution" depends="compile">
+	
+		<echo>Compiling ${src.tests.dir} to ${build.tests.dir}...</echo>
+		
+		<mkdir dir="${build.tests.dir}" />
+		
+		<javac destdir="${build.tests.dir}" debug="true">
+			<src path="${src.tests.dir}" />
+			<classpath refid="classpathSrcId" />
+		</javac>
+			
+		<echo>... done compiling test code to ${build.tests.dir}</echo>
+	
+	</target>
+	
+	<target name="clean-test" description="Cleans the file system in preparation for a new test run">
+		
+		<delete dir="${basedir}/reports" />
+		<mkdir dir="${basedir}/reports" />
+		
+		<mkdir dir="${output.reports.junit}"/>
+		
+		<delete dir="${build.tests.dir}"/>
+		
+		<delete file="${cobertura.ser.file}" />
+		<delete dir="${cobertura.instrument.dir}" />
+		
+	</target>
+	
+	<!-- -->
+	<target name="findbugs"
+		depends="compile-test"
+		description="Run code analysis over code to check for problems." >
+		
+		<mkdir dir="${output.reports.findbugs}" />
+		
+		<!-- Fail this target if FindBugs is not installed. -->
+		<available file="${findbugs.home.dir}/lib/findbugs.jar" property="findbugs.available" />
+		<fail unless="findbugs.available"
+			message="Error: FINDBUGS_HOME not set or findbugs.jar not found." />
+		
+		<taskdef name="findbugs"
+			classname="edu.umd.cs.findbugs.anttask.FindBugsTask"
+			classpath="${findbugs.home.dir}/lib/findbugs-ant.jar" />
+		
+		<!-- Run FindBugs. -->
+		<findbugs home="${findbugs.home.dir}"
+			workHard="true"
+			output="xml"
+			reportLevel="low"
+			outputFile="${output.reports.findbugs}/findbugs.xml" >
+			<!-- stylesheet="plain.xsl" -->
+			<!-- output="xml:withMessages" -->
+			
+			<sourcePath path="${build.src.dir}" />
+			<class location="${build.src.dir}" />
+			<auxClasspath refId="classpathSrcId" />
+			
+		</findbugs>
+	</target>
+	
+	<!-- <target name="run-tests" depends="junit, junit-report, cobertura-report, findbugs" /> -->
+	<target name="run-tests" depends="junit, cobertura-report, findbugs" />
+	
+</project>

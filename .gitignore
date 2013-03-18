@@ -1,0 +1,5 @@
+build
+buildtmp
+.settings
+reports
+dist
