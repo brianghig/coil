@@ -89,10 +89,8 @@
 	</target>
 	
 	<target name="junit-report" depends="junit" description="Creates a JUNIT report from the output of the JUNIT tests assumed to have previously run. Not necessarily dependent on the 'junit' task because this may be run to refresh the reports at any given time">
-		<delete dir="${output.reports.junit}" />
-		<mkdir dir="${output.reports.junit}" />
 		<junitreport todir="${output.reports.junit}">
-			<fileset dir="${output.reports.tmp.junit}">
+			<fileset dir="${output.reports.junit}">
 				<include name="*.xml" />
 				<exclude name="*.txt" />
 			</fileset>
@@ -120,7 +118,7 @@
 		<delete dir="${basedir}/reports" />
 		<mkdir dir="${basedir}/reports" />
 		
-		<mkdir dir="${output.reports.junit}"/>
+		<mkdir dir="${output.reports.junit}" />
 		
 		<delete dir="${build.tests.dir}"/>
 		
