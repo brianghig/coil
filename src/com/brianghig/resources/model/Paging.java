@@ -7,8 +7,8 @@ package com.brianghig.resources.model;
  */
 public class Paging {
 
-	private Integer start;
-	private Integer limit;
+	private int start;
+	private int limit;
 	
 	/**
 	 * Returns a Paging object populated with the validated start and limit arguments.
@@ -18,27 +18,25 @@ public class Paging {
 	 * @param limit non-negative max results value for the paging query
 	 * @return validated Paging object 
 	 */
-	public Paging( Integer start, Integer limit ) {
+	public Paging( int start, int limit ) {
 		
-		if( start != null && start < 0 ) {
+		if( start <= -1 ) {
 			throw new IllegalArgumentException("Start must be non-negative for pagination");
 		}
 		
-		if( limit != null && limit < 0 ) {
+		if( limit < 1 ) {
 			throw new IllegalArgumentException("Limit must be non-negative for pagination");
 		}
 		
 		this.start = start;
-		
-		
 		this.limit = limit;
 	}
 
-	public Integer getStart() {
+	public int getStart() {
 		return start;
 	}
 	
-	public Integer getLimit() {
+	public int getLimit() {
 		return limit;
 	}
 	

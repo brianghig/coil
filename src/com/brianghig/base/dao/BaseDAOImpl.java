@@ -37,14 +37,13 @@ public abstract class BaseDAOImpl {
 		 */
 		if( query != null && paging != null ) {
 			
-			// "start" maps to "firstResult", only if it is non-null
-			if( paging.getStart() != null ) {
-				query.setFirstResult(paging.getStart());
-			}
+			// "start" maps to "firstResult"
+			query.setFirstResult(paging.getStart());
 			
-			// "limit" maps to "maxResults", only if it is non-null
-			if( paging.getLimit() != null ) {
-				query.setMaxResults(paging.getLimit());
+			// "limit" maps to "maxResults", only if it is non-zero
+			int limit = paging.getLimit();
+			if( limit != 0 ) {
+				query.setMaxResults(limit);
 			}
 			
 		}

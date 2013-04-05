@@ -1,7 +1,7 @@
 package com.brianghig.test.resources;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
@@ -10,25 +10,25 @@ import com.brianghig.resources.model.Paging;
 
 public class ResourceModelTest {
 	
-	@Test
-	public void testPagingCreationNullStart() {
-		Paging paging = new Paging(null, 0);
-		assertNotNull("Expected non-null paging object returned with null start", paging);
-	}
-	
-	@Test
-	public void testPagingCreationNullLimit() {
-		Paging paging = new Paging(0, null);
-		assertNotNull("Unexpected Paging object returned from parameters with null limit", paging);
-		validatePagingParameters( paging, 0, null );
-	}
-	
-	@Test
-	public void testPagingCreationBothNull() {
-		Paging paging = new Paging(null, null);
-		assertNotNull("Unexpected Paging object returned from both null parameters", paging);
-		validatePagingParameters( paging, null, null );
-	}
+//	@Test
+//	public void testPagingCreationNullStart() {
+//		Paging paging = new Paging(null, 0);
+//		assertNotNull("Expected non-null paging object returned with null start", paging);
+//	}
+//	
+//	@Test
+//	public void testPagingCreationNullLimit() {
+//		Paging paging = new Paging(0, null);
+//		assertNotNull("Unexpected Paging object returned from parameters with null limit", paging);
+//		validatePagingParameters( paging, 0, null );
+//	}
+//	
+//	@Test
+//	public void testPagingCreationBothNull() {
+//		Paging paging = new Paging(null, null);
+//		assertNotNull("Unexpected Paging object returned from both null parameters", paging);
+//		validatePagingParameters( paging, null, null );
+//	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testPagingCreationNegativeStart() {
@@ -84,10 +84,10 @@ public class ResourceModelTest {
 	 * @param start
 	 * @param limit
 	 */
-	protected void validatePagingParameters(Paging pagingObject, Integer start, Integer limit) {
+	protected void validatePagingParameters(Paging pagingObject, int start, int limit) {
 		assertNotNull("Expected non-null paging object", pagingObject);
-		assertEquals("Expected start values to match", start, pagingObject.getStart());
-		assertEquals("Expected limit values to match", limit, pagingObject.getLimit());
+		assertTrue("Expected start values to match", start == pagingObject.getStart() );
+		assertTrue("Expected limit values to match", limit == pagingObject.getLimit() );
 	}
 	
 }

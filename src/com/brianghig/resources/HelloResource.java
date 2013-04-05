@@ -25,7 +25,7 @@ public class HelloResource extends AbstractResource {
 		return "Works!!";
 	}
 	
-	@RequestMapping(value="test", method=RequestMethod.GET, produces={MediaType.APPLICATION_JSON_VALUE})
+	@RequestMapping(value="test", method=RequestMethod.GET, produces={MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
 	public @ResponseBody Map<String, Object> getData(
 			@RequestParam(value="start", required=false) Integer start,
 			@RequestParam(value="limit", required=false) Integer limit) throws Exception {
