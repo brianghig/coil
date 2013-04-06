@@ -24,7 +24,7 @@ public class Paging {
 			throw new IllegalArgumentException("Start must be non-negative for pagination");
 		}
 		
-		if( limit < 1 ) {
+		if( limit < 0 ) {
 			throw new IllegalArgumentException("Limit must be non-negative for pagination");
 		}
 		
